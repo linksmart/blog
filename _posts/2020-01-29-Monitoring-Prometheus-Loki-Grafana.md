@@ -1,5 +1,5 @@
 # Introduction
-In the current tutorial we shall introduce on how Prometheus is deployed in a federated environment where different servers running different docker containers interact with a monitoring server to expose their metrics. 
+In the current tutorial we shall introduce on how monitoring server with Prometheus and Loki is deployed in a federated environment where different servers running different docker containers interact with a monitoring server to expose their metrics. 
 
 
 ## Motivation
@@ -8,12 +8,15 @@ In the current tutorial we shall introduce on how Prometheus is deployed in a fe
  What is the importance of distributed monitoring?
 
  Why logging?
-
+ 
 ## Overview
 After reading this blog, you should be able to perform the following:
 1. **Runtime Metrics:** Collection of run time metrics of running containers at different hosts. This mainly includes the resource and network bandwidth usage of the running containers. We shall achieve this using Prometheus, cAdvisor and Grafana.
 2. **Alerting:** Alerting helps the administrators or the maintainers to know the service status without manually following the service status visualizations. The administrators can create different alerting rules and get notifications through different channels. We shall achieve alerting using Alertmanager and Prometheus. 
 3. **Distributed Logging:** Logging gives an insight to the running applications and their behaviour. This can be used by the service providers to deduce the causes for malfunctioning and to get an overview of the client behavior. In the current document, we visualize the logs exported by NGINX. We shall achieve the logging using Loki and Grafana.
+   
+# Existing Monitoring solutions
+# Prometheus and Loki
 # Deployment and the Data Flow
 The figure below shows a possible deployment where both metrics (collected by Prometheus and derived from Loki logs) and logs (collected by loki) are visualized using Grafana. Monitoring target hosts are being monitored by the monitoring infrastructure running on monitoring server. Vector and cAdvisors running on the target hosts help in exporting the metrics and logs to the monitoring server. Vector is used to publish the logs to Loki and cAdvisor is used to expose the metrics of the monitoring targets so that Prometheus can pull from them using cAdvisor APIs.
 
