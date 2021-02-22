@@ -1,14 +1,20 @@
 # Introduction
-In the current tutorial we shall introduce on how monitoring server with Prometheus and Loki is deployed in a federated environment where different servers running different docker containers interact with a monitoring server to expose their metrics. 
+With the growth of micro-service based architectures, the points of failures have distributed across multiple applications and servers. This raises a need for an active monitoring solution that helps the administrators and the application developers to know the failures before even the users of the systems notice it. In this blog we briefly introduce the responsibilities of the monitoring system followed by a brief guidance to Prometheus and Loki based monitoring infrastructure.
 
 
 ## Motivation
- Why an organization needs monitoring?
 
  What is the importance of distributed monitoring?
+Monitoring infrastructure can help in the following aspects:
+### 1. Identification of faults: 
+    Faults such as network failures, unavailability, application exceptions resource overload are unpreventable while running a complex IT infrastructure. Monitoring helps in identifying the faults so that they are addressed on time. sometimes, it is not just about the faults that has occured already, rather it may be about the faults that are about to occur. The monitoring system should facilitate the identification of possible faults by providing interactive dashboards and by providing timely alerts. The fault identification involves indication of existence of a fault and sometimes showing the exact point of failure. 
+### 2. Debugging
+    Debugging an identified problems need a deep investigation with respect to the occured fault or an event. This sometimes needs different factors which revolve around the deployed service viz. CPU usage, internal logs, network transmissions, memory usage  and exceptions. Monitoring dashboards makes such information available to the debuggers without much efforts of manual extraction. Monitoring the logs accelerate the debugging provided there is a provision for visualization and filtering of logs.
+### 3. Data Driven Insights
+    Analyzing the long term and short term data collected for a running service add multitude of strategical benefits. Historical data showing the resource usage of a service over time assists in the decision related to acquision of the software, comparing the alternatives, scaling up/down the infrastructure. 
 
- Why logging?
- 
+Now that we listed out the overall purpose of the monitoring, a typical monitoring tool would provide mainly monitoring and reporting functinalities. Monitoring involves the gathering of various metrics and logs. Reporting involves the visualization and alerting based on the collected metrics. 
+Optionally monitoring tools can also perform certain administrative actions such as resource optimization (e.g. [Amazon Cloudwatch](https://aws.amazon.com/cloudwatch/)), providing remote management tooling ([NinjaRMM](https://www.ninjarmm.com/)) to the services and IT workflow automation ([OpManager](https://www.manageengine.com/network-monitoring/)).
 ## Overview
 After reading this blog, you should be able to perform the following:
 1. **Runtime Metrics:** Collection of run time metrics of running containers at different hosts. This mainly includes the resource and network bandwidth usage of the running containers. We shall achieve this using Prometheus, cAdvisor and Grafana.
@@ -53,6 +59,9 @@ $wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2
 
 # Use Case (EFPF)
 Introduction to efpf and its infrastructure
+- Composite applications failing of containers: monitoring at a central location.
+- System administration to know RAM usage etc
+- 
 
 Multiple clients located at different locations sending the logs
 Example client(s)
