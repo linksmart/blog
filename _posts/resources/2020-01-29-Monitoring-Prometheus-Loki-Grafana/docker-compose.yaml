@@ -1,0 +1,62 @@
+version: "2.4"
+services:
+  grafana:
+    image: grafana/grafana:7.3.1
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    restart: unless-stopped
+    user: 5677:5677 # You can chose any valid user:group id. 
+                  #Please be ensure that users are given rights to the data folder
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+    - 9090:9090
+    command:
+    - --config.file=/etc/prometheus/prometheus.yaml
+    - --storage.tsdb.retention.time=90d
+    - --web.route-prefix=/
+    - --web.external-url=https://example.com/prometheus
+    volumes:
+    - ./conf/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro
+    - ./conf/prometheus_alert.rules:/etc/prometheus/alert.rules:ro
+    - ./data/prometheus:/prometheus
+    restart: unless-stopped
+    depends_on:
+    - alertmanager
+    user: 5678:5678 # You can chose any valid user:group id. 
+                  #Please be ensure that users are given rights to the data folder
+  alertmanager:
+    image: prom/alertmanager
+    container_name: alertmanager
+    volumes:
+      - ./conf/alertmanager.yaml:/etc/alertmanager/alertmanager.yaml
+      - ./data/alertmanager:/data
+    command:
+      - --config.file=/etc/alertmanager/alertmanager.yaml
+      - --storage.path=/data
+      - --log.level=debug
+    restart: unless-stopped
+    user: 5679:5679 #You can chose any valid user:group id. 
+                  #Please be ensure that users are given rights to the data folder
+  loki:
+    image: grafana/loki:2.1.0
+    container_name: loki
+    volumes:
+      - ./conf/loki.yaml:/etc/loki/loki.yaml
+      - ./data/loki:/mnt
+    restart: unless-stopped
+    ports:
+      - 3100:3100
+    networks:
+      - lokinet
+      - grafana
+    command:
+      - -config.file=/etc/loki/loki.yaml
+    user: 5680:5680  #You can chose any valid user:group id. 
+                      #Please be ensure that users are given rights to the data folder
+
+
