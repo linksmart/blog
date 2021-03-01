@@ -7,11 +7,11 @@ With the growth of micro-service based architectures, the points of failures hav
  What is the importance of distributed monitoring?
 Monitoring infrastructure can help in the following aspects:
 ### 1. Identification of faults: 
-    Faults such as network failures, unavailability, application exceptions resource overload are unpreventable while running a complex IT infrastructure. Monitoring helps in identifying the faults so that they are addressed on time. sometimes, it is not just about the faults that has occured already, rather it may be about the faults that are about to occur. The monitoring system should facilitate the identification of possible faults by providing interactive dashboards and by providing timely alerts. The fault identification involves indication of existence of a fault and sometimes showing the exact point of failure. 
+Faults such as network failures, unavailability, application exceptions resource overload are unpreventable while running a complex IT infrastructure. Monitoring helps in identifying the faults so that they are addressed on time. sometimes, it is not just about the faults that has occured already, rather it may be about the faults that are about to occur. The monitoring system should facilitate the identification of possible faults by providing interactive dashboards and by providing timely alerts. The fault identification involves indication of existence of a fault and sometimes showing the exact point of failure. 
 ### 2. Debugging
-    Debugging an identified problems need a deep investigation with respect to the occured fault or an event. This sometimes needs different factors which revolve around the deployed service viz. CPU usage, internal logs, network transmissions, memory usage  and exceptions. Monitoring dashboards makes such information available to the debuggers without much efforts of manual extraction. Monitoring the logs accelerate the debugging provided there is a provision for visualization and filtering of logs.
+Debugging an identified problems need a deep investigation with respect to the occured fault or an event. This sometimes needs different factors which revolve around the deployed service viz. CPU usage, internal logs, network transmissions, memory usage  and exceptions. Monitoring dashboards makes such information available to the debuggers without much efforts of manual extraction. Monitoring the logs accelerate the debugging provided there is a provision for visualization and filtering of logs.
 ### 3. Data Driven Insights
-    Analyzing the long term and short term data collected for a running service add multitude of strategical benefits. Historical data showing the resource usage of a service over time assists in the decision related to acquision of the software, comparing the alternatives, scaling up/down the infrastructure. 
+Analyzing the long term and short term data collected for a running service add multitude of strategical benefits. Historical data showing the resource usage of a service over time assists in the decision related to acquision of the software, comparing the alternatives, scaling up/down the infrastructure. 
 
 Now that we listed out the overall purpose of the monitoring, a typical monitoring tool would provide mainly monitoring and reporting functinalities. Monitoring involves the gathering of various metrics and logs. Reporting involves the visualization and alerting based on the collected metrics. 
 Optionally monitoring tools can also perform certain administrative actions such as resource optimization (e.g. [Amazon Cloudwatch](https://aws.amazon.com/cloudwatch/)), providing remote management tooling ([NinjaRMM](https://www.ninjarmm.com/)) and IT workflow automation ([OpManager](https://www.manageengine.com/network-monitoring/)).
@@ -33,25 +33,33 @@ The figure below shows a monitoring infrastructure deployment where a Monitoring
 Monitoring server is composed of Grafana, Prometheus, Loki and Alertmanager. Optionally one can run vector and cAdvisor in case you want to monitor the monitoring server itself.
 
 download the docker compose file and the configuration files:
-```
-# Download Docker compose
-$wget  https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/docker-compose-monitoring_server.yml -O docker-compose.yml
+1. Download Docker compose file from gitlab
+    ```
+    $wget  https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/docker-compose-monitoring_server.yml -O docker-compose.yml
+    ```
+2. create a configuration directory directory
+    ```
+    $mkdir conf
+    ```
+3. Download alertmanager configuration
+    ```
+    $wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/prometheus_conf_alertmanager.yml -O conf/alertmanager.yml
+    ```
+4. Download prometheus configuration
+    ```
+    $wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/prometheus_conf_prometheus.yml -O conf/prometheus.yml
+    ```
+5. Download loki configuration
+   ```
+    $wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/loki_loki-config.yaml -O conf/loki-config.yaml
 
-# create a conf directory
-$mkdir conf
-
-# Download alertmanager conf
-$wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/prometheus_conf_alertmanager.yml -O conf/alertmanager.yml
-
-# Download prometheus configuration
-$wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/prometheus_conf_prometheus.yml -O conf/prometheus.yml
-
-# Download loki configuration
-$wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/loki_loki-config.yaml -O conf/loki-config.yaml
-
-```
-
+    ```
+6. Run the docker compose
+    ```
+    docker-compose up
+    ```
 ## Setting Up the Monitoring Clients
+TODO
 # Use Case (EFPF)
 Introduction to efpf and its infrastructure
 - Composite applications failing of containers: monitoring at a central location.
