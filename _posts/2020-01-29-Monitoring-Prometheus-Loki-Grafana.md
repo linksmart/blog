@@ -30,50 +30,56 @@ The figure below shows a monitoring infrastructure deployment where a Monitoring
 
 ## Setting up the Monitoring Server with Docker
 
-Monitoring server is composed of Grafana, Prometheus, Loki and Alertmanager. Optionally one can run vector and cAdvisor in case you want to monitor the monitoring server itself.
+Monitoring server is composed of Grafana, Prometheus, Loki and Alertmanager. Optionally you can run vector and cAdvisor in case you want to monitor the monitoring server itself.
 
-download the docker compose file and the configuration files:
+The monitoring server deployment can have following file structure, where `conf/` directory has all the configurations and `data/` directory has all the docker volumes mounted to the docker containers running monitoring servers
+```
+.
++-- docker-compose.yaml
++-- conf/
+|   +-- alertmanager.yaml
+|   +-- loki.yaml
+|   +-- prometheus_alert.rules
+|   +-- prometheus.yaml
++-- data/
+|   +-- alertmanager/
+|   +-- grafana/
+|   +-- loki/
+|   +-- prometheus/
+```
+Let us set up the server by following following steps: 
 1. Download Docker compose file using wget  
     ```
-    wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/docker-compose.yml -O docker-compose.yml
+    wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/docker-compose.yaml -O docker-compose.yaml
     ```
-2. Create a configuration directory directory
+1. Create a configuration directory and directories for docker volume  directories.
     ```
-    mkdir conf
+    mkdir -p conf data/grafana data/prometheus data/alertmanager data/loki
     ```
-3. Download alertmanager configuration
-    ```
-    wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/.yml -O conf/alertmanager.yml
-    ```
-4. Download prometheus configuration
-    ```
-    wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/prometheus.yml -O conf/prometheus.yml
-    ```
-5. Download loki configuration
+1. Set the right permissions so that the docker containers have permissions to read and write the contents of the volumes. See the `docker-compose.yaml` file for the set values. The user ids are explicitly set in the `docker-compose.yaml` to avoid the problem of having a default user id which is difficult for book-keeping. You are free to chose any ID.
    ```
-    wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/loki.yaml -O conf/loki.yaml
-
-    ```
-6. Run the docker-compose. Before running the docker compose file, please make sure the volumes are created and right permissions are set.The user ids are explicitly set in the docker-compose files order to avoid the problem of having a default user id which is difficult for book-keeping. You are free to chose any ID.
-    ```
-    mkdir -p data/grafana data/prometheus data/alertmanager data/loki
     sudo chown -R 5677:5677 data/grafana
     sudo chown -R 5678:5678 data/prometheus
     sudo chown -R 5679:5679 data/alertmanager
     sudo chown -R 5680:5680 data/loki
+   ```
+1. Create and edit Prometheus configuration file `conf/prometheus.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/prometheus.yaml). More about the configuration can be found in the the [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/).
+1. Create and edit Prometheus alert rules configuration file `conf/alert.rules`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/prometheus_alert.rules). More about the configuration can be found in the the [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/).
 
+3. Create and edit the Alertmanager configuration file `conf/alertmanager.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/alertmanager.yaml). More about the Alertmanager configuration can be found in the the [official documentation](https://prometheus.io/docs/alerting/latest/configuration/).
+ 
+4. Create and edit the Loki configuration file `conf/loki.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/loki.yaml). More about the Loki configuration can be found in the the [official documentation](https://grafana.com/docs/loki/latest/configuration/).
+5. Change the Grafana configurations. You can do it by setting the [environmental variables](https://grafana.com/docs/grafana/latest/administration/configuration/) through docker-compose.yaml.  You can also pre-install Grafana plugins using the environmental variables.
+
+6. Run all the services as docker containers. 
+    ```
     docker-compose up
     ```
+
 ## Setting Up the Monitoring Clients
 TODO
 # Use Case (EFPF)
-Introduction to efpf and its infrastructure
-- Composite applications failing of containers: monitoring at a central location.
-- System administration to know RAM usage etc
-- 
-
-Multiple clients located at different locations sending the logs
-Example client(s)
+TODO
 
 
 

@@ -1,7 +1,7 @@
 version: "2.4"
 services:
   grafana:
-    image: grafana/grafana:7.3.1
+    image: grafana/grafana
     container_name: grafana
     ports:
       - 3000:3000
@@ -11,7 +11,7 @@ services:
     user: 5677:5677 # You can chose any valid user:group id. 
                   #Please be ensure that users are given rights to the data folder
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus
     container_name: prometheus
     ports:
     - 9090:9090
@@ -43,7 +43,7 @@ services:
     user: 5679:5679 #You can chose any valid user:group id. 
                   #Please be ensure that users are given rights to the data folder
   loki:
-    image: grafana/loki:2.1.0
+    image: grafana/loki
     container_name: loki
     volumes:
       - ./conf/loki.yaml:/etc/loki/loki.yaml
