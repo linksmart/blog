@@ -6,7 +6,7 @@ With the growth of micro-service based architectures, the points of failures hav
 
  What is the importance of distributed monitoring?
 Monitoring infrastructure can help in the following aspects:
-### 1. Identification of faults: 
+### 1. Identification of Faults: 
 Faults such as network failures, unavailability, application exceptions resource overload are unpreventable while running a complex IT infrastructure. Monitoring helps in identifying the faults so that they are addressed on time. sometimes, it is not just about the faults that has occured already, rather it may be about the faults that are about to occur. The monitoring system should facilitate the identification of possible faults by providing interactive dashboards and by providing timely alerts. The fault identification involves indication of existence of a fault and sometimes showing the exact point of failure. 
 ### 2. Debugging
 Debugging an identified problems need a deep investigation with respect to the occured fault or an event. This sometimes needs different factors which revolve around the deployed service viz. CPU usage, internal logs, network transmissions, memory usage  and exceptions. Monitoring dashboards makes such information available to the debuggers without much efforts of manual extraction. Monitoring the logs accelerate the debugging provided there is a provision for visualization and filtering of logs.
@@ -28,34 +28,40 @@ The figure below shows a monitoring infrastructure deployment where a Monitoring
 
 
 
-## Setting up the Monitoring Server
+## Setting up the Monitoring Server with Docker
 
 Monitoring server is composed of Grafana, Prometheus, Loki and Alertmanager. Optionally one can run vector and cAdvisor in case you want to monitor the monitoring server itself.
 
 download the docker compose file and the configuration files:
-1. Download Docker compose file from gitlab
+1. Download Docker compose file using wget  
     ```
-    $wget  https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/docker-compose-monitoring_server.yml -O docker-compose.yml
+    wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/docker-compose.yml -O docker-compose.yml
     ```
-2. create a configuration directory directory
+2. Create a configuration directory directory
     ```
-    $mkdir conf
+    mkdir conf
     ```
 3. Download alertmanager configuration
     ```
-    $wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/prometheus_conf_alertmanager.yml -O conf/alertmanager.yml
+    wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/.yml -O conf/alertmanager.yml
     ```
 4. Download prometheus configuration
     ```
-    $wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/prometheus_conf_prometheus.yml -O conf/prometheus.yml
+    wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/prometheus.yml -O conf/prometheus.yml
     ```
 5. Download loki configuration
    ```
-    $wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/loki_loki-config.yaml -O conf/loki-config.yaml
+    wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2020-01-29-Monitoring-Prometheus-Loki-Grafana/loki.yaml -O conf/loki.yaml
 
     ```
-6. Run the docker compose
+6. Run the docker-compose. Before running the docker compose file, please make sure the volumes are created and right permissions are set.The user ids are explicitly set in the docker-compose files order to avoid the problem of having a default user id which is difficult for book-keeping. You are free to chose any ID.
     ```
+    mkdir -p data/grafana data/prometheus data/alertmanager data/loki
+    sudo chown -R 5677:5677 data/grafana
+    sudo chown -R 5678:5678 data/prometheus
+    sudo chown -R 5679:5679 data/alertmanager
+    sudo chown -R 5680:5680 data/loki
+
     docker-compose up
     ```
 ## Setting Up the Monitoring Clients
