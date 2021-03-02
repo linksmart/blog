@@ -1,4 +1,3 @@
-# Introduction
 With the growth of micro-service based architectures, the points of failures have distributed across multiple applications and servers. This raises a need for an active monitoring solution that helps the administrators and the application developers to know the failures before even the users of the systems notice it. In this blog we briefly introduce the responsibilities of the monitoring system followed by a brief guidance to Prometheus and Loki based monitoring infrastructure.
 
 
