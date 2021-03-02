@@ -86,4 +86,4 @@ exclude:
   - CNAME
   - _posts/resources/2021-03-01-Monitoring-Prometheus-Loki-Grafana/alertmanager.yaml
   - _posts/resources/2021-03-01-Monitoring-Prometheus-Loki-Grafana/loki.yaml
-  _posts/resources/2021-03-01-Monitoring-Prometheus-Loki-Grafana/prometheus.yaml
+  - _posts/resources/2021-03-01-Monitoring-Prometheus-Loki-Grafana/prometheus.yaml
