@@ -26,7 +26,6 @@ After reading this blog, the reader should be able to perform the following task
 # Deployment and Data Flow
 The figure below shows a monitoring infrastructure deployment where a Monitoring server monitors different target hosts running in local or remote premises. Prometheus, Loki, Grafana and Alertmanagers are installed on the Monitoring server. The target hosts are installed with [vector](https://github.com/timberio/vector) and [cAdvisor](https://github.com/google/cadvisor) to extract the logs and metrics respectively from the target hosts. Vector collects the docker logs and cAdvisor collects different docker metrics. Prometheus scrapes the metrics from cAdvisor. Loki on the other hand does not have a scraping mechanism and hence the logs are pushed by vector to Loki. Both metrics (collected by Prometheus) and logs (collected by loki) are visualized using Grafana. Generated alerts are forwarded to Alertmanager so that it is further grouped, deduplicated and routed to the relevant applications.
 
-![The deployment and data flow](https://raw.githubusercontent.com/linksmart/blog/master/_posts/resources/2020-01-29-Monitoring-Prometheus-Loki-Grafana/monitoring.png)
 
 
 ## Setting up the Monitoring Server with Docker
