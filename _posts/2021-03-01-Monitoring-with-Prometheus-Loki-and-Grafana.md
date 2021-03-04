@@ -61,8 +61,7 @@ Let us set up the server by the following steps:
     sudo chown -R 5679:5679 data/alertmanager
     sudo chown -R 5680:5680 data/Loki
    ```
-4. Create and edit Prometheus configuration file `conf/prometheus.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus.yaml). `scrape_configs` specify different jobs related to different targets for metric monitoring activities. Prometheus pulls the metrics from the endpoints mentioned under the `scrape_config`. The setting related to `alerting` configures Prometheus to send the alerts to `alertmanager` which further routes the generated alerts. 
-   
+4. Create and edit Prometheus configuration file `conf/prometheus.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus.yaml). `scrape_configs` specify different jobs related to different targets for metric monitoring activities. Prometheus pulls the metrics from the endpoints mentioned under the `scrape_config`. The setting related to `alerting` configures Prometheus to send the alerts to `alertmanager` which further routes the generated alerts.    
    More about the configuration can be found in the [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/).
    
 5. Create and edit Prometheus alert rules configuration file `conf/alert.rules`. A sample rule file can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus_alert.rules). In the sample, the group `targets` triggers alert whenever a scraping target of Prometheus is down. The other two groups create alerts whenever a container running in a target server is down.
