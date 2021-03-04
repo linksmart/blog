@@ -8,7 +8,7 @@ services:
     volumes:
       - ./data/grafana:/var/lib/grafana
     restart: unless-stopped
-    user: 5677:5677 # You can chose any valid user:group id. 
+    user: 5678:5678 # You can chose any valid user:group id. 
                   #Please be ensure that users are given rights to the data folder
   prometheus:
     image: prom/prometheus
@@ -40,7 +40,7 @@ services:
       - --storage.path=/data
       - --log.level=debug
     restart: unless-stopped
-    user: 5679:5679 #You can chose any valid user:group id. 
+    user: 5678:5678 #You can chose any valid user:group id. 
                   #Please be ensure that users are given rights to the data folder
   loki:
     image: grafana/loki
@@ -56,7 +56,7 @@ services:
       - grafana
     command:
       - -config.file=/etc/loki/loki.yaml
-    user: 5680:5680  #You can chose any valid user:group id. 
+    user: 5678:5678  #You can chose any valid user:group id. 
                       #Please be ensure that users are given rights to the data folder
 
 

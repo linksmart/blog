@@ -50,30 +50,27 @@ Let us set up the server by the following steps:
     ```
     wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/docker-compose.yaml
     ```
-2. Create a configuration directory and directories for docker volume directories.
+2. Create a configuration directory and directories for docker volume directories. If the mounted data directories are not created beforehand, Docker engine creates these directories which cannot be altered by the containers and causes unexpected behaviors.
     ```
-    mkdir -p conf data/grafana data/prometheus data/alertmanager data/Loki
+    mkdir -p conf data data/grafana data/prometheus data/alertmanager data/loki
     ```
-3. Set the right permissions so that the docker containers have permissions to read and write the contents of the volumes. See the `docker-compose.yaml` file for the set values. The user ids are explicitly set in the `docker-compose.yaml` to avoid the problem of having a default user id which is difficult for book-keeping. You are free to choose any ID.
+   Set the right ownership to the volumes so that the docker containers have permissions to read and write the contents of the volumes. See the `docker-compose.yaml` file for the set values. The user ids are explicitly set in the `docker-compose.yaml` to avoid the problem of having a default user id which is difficult for book-keeping. The user id should match the one set in docker-compose file.
    ```
-    sudo chown -R 5677:5677 data/grafana
-    sudo chown -R 5678:5678 data/prometheus
-    sudo chown -R 5679:5679 data/alertmanager
-    sudo chown -R 5680:5680 data/Loki
+    sudo chown -R 5678:5678 data
    ```
-4. Create and edit Prometheus configuration file `conf/prometheus.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus.yaml). `scrape_configs` specify different jobs related to different targets for metric monitoring activities. Prometheus pulls the metrics from the endpoints mentioned under the `scrape_config`. The setting related to `alerting` configures Prometheus to send the alerts to `alertmanager` which further routes the generated alerts.    
+3. Create and edit Prometheus configuration file `conf/prometheus.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus.yaml). `scrape_configs` specify different jobs related to different targets for metric monitoring activities. Prometheus pulls the metrics from the endpoints mentioned under the `scrape_config`. The setting related to `alerting` configures Prometheus to send the alerts to `alertmanager` which further routes the generated alerts.    
    More about the configuration can be found in the [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/).
    
-5. Create and edit Prometheus alert rules configuration file `conf/alert.rules`. A sample rule file can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus_alert.rules). In the sample, the group `targets` triggers alert whenever a scraping target of Prometheus is down. The other two groups create alerts whenever a container running in a target server is down.
+4. Create and edit Prometheus alert rules configuration file `conf/alert.rules`. A sample rule file can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus_alert.rules). In the sample, the group `targets` triggers alert whenever a scraping target of Prometheus is down. The other two groups create alerts whenever a container running in a target server is down.
    More about the configuration can be found in the [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/).
 
-6. Create and edit the Alertmanager configuration file `conf/alertmanager.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/alertmanager.yaml).  Here the routing options such as mail servers and mailing lists are configured.
+5. Create and edit the Alertmanager configuration file `conf/alertmanager.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/alertmanager.yaml).  Here the routing options such as mail servers and mailing lists are configured.
    More about the Alertmanager configuration can be found in the [official documentation](https://prometheus.io/docs/alerting/latest/configuration/).
  
-7. Create and edit the Loki configuration file `conf/Loki.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/Loki.yaml). More about the Loki configuration can be found in the [official documentation](https://grafana.com/docs/Loki/latest/configuration/).
-8.  Change the Grafana configurations. You can do it by setting the [environmental variables](https://grafana.com/docs/grafana/latest/administration/configuration/) through docker-compose.yaml.  You can also pre-install Grafana plugins using the environmental variables.
+6. Create and edit the Loki configuration file `conf/Loki.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/Loki.yaml). More about the Loki configuration can be found in the [official documentation](https://grafana.com/docs/Loki/latest/configuration/).
+7.  Change the Grafana configurations. You can do it by setting the [environmental variables](https://grafana.com/docs/grafana/latest/administration/configuration/) through docker-compose.yaml.  You can also pre-install Grafana plugins using the environmental variables.
 
-9.  Run all the services as docker containers. 
+8.  Run all the services as docker containers. 
     ```
     docker-compose up
     ```
