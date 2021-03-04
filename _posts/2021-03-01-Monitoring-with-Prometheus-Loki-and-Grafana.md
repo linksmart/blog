@@ -63,31 +63,86 @@ Let us set up the server by following following steps:
     sudo chown -R 5679:5679 data/alertmanager
     sudo chown -R 5680:5680 data/loki
    ```
-4. Create and edit Prometheus configuration file `conf/prometheus.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus.yaml). More about the configuration can be found in the the [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/).
-5. Create and edit Prometheus alert rules configuration file `conf/alert.rules`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus_alert.rules). More about the configuration can be found in the the [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/).
+4. Create and edit Prometheus configuration file `conf/prometheus.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus.yaml). `scrape_configs` specify different jobs related to different targets for metric monitoring activities. Prometheus pulls the metrics from the endpoints mentioned under the `scrape_config`. The setting related to `alerting` configures Prometheus to send the alerts to `alertmanager` which further routes the generated alerts. 
+   
+   More about the configuration can be found in the the [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/).
+   
+5. Create and edit Prometheus alert rules configuration file `conf/alert.rules`. A sample rule file can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus_alert.rules). In the sample, the group `targets` triggers alert whenever a scraping target of Prometheus is down. The other two groups create alerts whenever a container running in a target server is down.
+   More about the configuration can be found in the the [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/).
 
-6. Create and edit the Alertmanager configuration file `conf/alertmanager.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/alertmanager.yaml). More about the Alertmanager configuration can be found in the the [official documentation](https://prometheus.io/docs/alerting/latest/configuration/).
+6. Create and edit the Alertmanager configuration file `conf/alertmanager.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/alertmanager.yaml).  Here the routing options such as mail servers and mailing lists are configured.
+   More about the Alertmanager configuration can be found in the the [official documentation](https://prometheus.io/docs/alerting/latest/configuration/).
  
 7. Create and edit the Loki configuration file `conf/loki.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/loki.yaml). More about the Loki configuration can be found in the the [official documentation](https://grafana.com/docs/loki/latest/configuration/).
-8. Change the Grafana configurations. You can do it by setting the [environmental variables](https://grafana.com/docs/grafana/latest/administration/configuration/) through docker-compose.yaml.  You can also pre-install Grafana plugins using the environmental variables.
+8.  Change the Grafana configurations. You can do it by setting the [environmental variables](https://grafana.com/docs/grafana/latest/administration/configuration/) through docker-compose.yaml.  You can also pre-install Grafana plugins using the environmental variables.
 
-9. Run all the services as docker containers. 
+9.  Run all the services as docker containers. 
     ```
     docker-compose up
     ```
-TODO:
-* How to set up data sources 
-* Dashboards
+
+
 ## Setting Up the Monitoring Clients
-TODO
-* Installation instructiuons
-* Adding targets
+### 1. Exporting the metrics to Prometheus
+#### Export metrics using cAdvisor
+If you are running your containers in a virtual machine and want to expose metrics related to these containers to prometheus, [cAdvisor](https://github.com/google/cadvisor) can be a handy tool.  Note that cAdvidor runs in previleged mode and mounts the root of the filesystem as a volume. This might cause security issues if the container is not frequently updated.
+
+#### Use your own prometheus exporters
+If you want to use a custom exporter, there are plenty of other exporters listed in the[ prometheus official page](https://prometheus.io/docs/instrumenting/exporters/). 
+
+### 2. Adding the scrape config in prometheus
+Once exporters are setup following the instructions mentioned in the User guide, edit the  `prometheus.yaml` to add the following configuration.
+```
+  - job_name: cadvisor_vm1
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['vm1:8080']
+```
+
+## Log Monitoring Using Loki
+### 1. Exporting the Logs to Loki
+If you are running your containers in a server and want to expose logs related to these containers to Loki, [vector](https://github.com/timberio/vector) can be a handy tool. You can also use [Promtail](https://grafana.com/docs/loki/latest/clients/promtail/)  to push the logs to Loki. Other supported clients for Loki are listed [here](https://grafana.com/docs/loki/latest/clients/). 
+
+## Visualization of the metrics and Logs
+To visualize the Prometheus metrics and Loki logs in Grafana, the [Prometheus data source plugin](https://www.prometheus.io/docs/visualization/grafana/#grafana-support-for-prometheus) in Grafana needs to be configured. First, login to Grafana as admin with [default credentials](https://grafana.com/docs/grafana/latest/getting-started/getting-started/#step-2-log-in).
+Then, follow the instuctions specified in the official documentation of [Prometheus data source plugin](https://www.prometheus.io/docs/visualization/grafana/#creating-a-prometheus-data-source)  and [Loki data source plugin](https://grafana.com/docs/grafana/latest/datasources/loki/#adding-the-data-source) to setup the plugins.
+
+### Exploring Loki and Prometheus
+Both the data sources of Loki and Prometheus provide [exploring functionalities](https://monitor.efpf.linksmart.eu/grafana/explore). 
+Loki can be explored using [LogQL](https://grafana.com/docs/loki/latest/logql/) queries and Prometheus can be explored using [PromQL](https://prometheus.io/docs/prometheus/latest/querying/basics/).
+#### PromQL examples
+- Overall CPU usage (percentage) of all the containers running in a host for 5 minutes
+
+	`rate(container_cpu_user_seconds_total{image!="",job="<target name>"}[5m]) * 100`
+- Overall Memory usage of all the containers running in a host
+
+	`container_memory_usage_bytes{image!="",job="<target name>"}`
+#### LogQL examples
+- Get the NGINX logs where there was HTTP error :
+	This query shall show the logs there are 4xx or 5xx errors:  
+
+	`{containers="<container_name>"}  |~ "/grafana" |~ "HTTP.1[.]1.. [4-5][0-9][0-9]"`
+
+- Rate of HTTP errors (4XX and 5XX responses) for 10 minutes for the resource endpoint `/grafana`: 
+
+	`count_over_time({containers="<container_name>"}  |~ "/grafana" |~ "HTTP.1[.]1.. [4-5][0-9][0-9]" [10m]) `
+
+	The result is a metric. Therefore this can be visualized using panels
+
+### Visualization using Grafana Panels
+If the exporter to Prometheus is cAdvisor, then a ready made [cadvisor-prometheus panel](https://grafana.com/grafana/dashboards/193) can be used to visualize the docker containers.
+
+![Monitoring the docker containers running in a server](https://github.com/linksmart/blog/raw/master/_posts/resources/2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/docker-monitoring-panel.png)
+
+In order to visualize Loki metrics, such as the logs from NGINX as described in the previous LogQL examples, Graph or stat panels can be used. Inorder to see bare logs, Logs panels can be used. There is also  a recently [published panel](https://grafana.com/grafana/dashboards/12559) to show NGINX logs. 
+
 # Use Case (EFPF)
 * Distributed system is deployed. helping the administrator
 * Composite application scenario
 * Factory gateways 
 
 # Acknowledgement
+This work was funded by the European Commission (European Union) within the H2020 DT-ICT-07-2018-2019 project “European Connected Factory Platform for Agile Manufacturing” (EFPF), grant number 825075.
 
 ---
 _By Shreekantha Devasya_
