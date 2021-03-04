@@ -134,10 +134,23 @@ If the exporter to Prometheus is cAdvisor, then a ready made [cadvisor-prometheu
 
 In order to visualize Loki metrics, such as the logs from NGINX as described in the previous LogQL examples, Graph or stat panels can be used. Inorder to see bare logs, Logs panels can be used. There is also  a recently [published panel](https://grafana.com/grafana/dashboards/12559) to show NGINX logs. 
 
-# Use Case (EFPF)
-* Distributed system is deployed. helping the administrator
-* Composite application scenario
-* Factory gateways 
+# Use Case: The EFPF Ecosystem
+
+The EFPF ecosystem, being created in a European project [EFPF: European Connected Factory Platform for Agile Manufacturing](https://www.efpf.org), is a federated platform ecosystem that interlinks multiple IoT platforms in the manufacturing domain. The objective of the EFPF ecosystem is to enable communication and collaboration among the connected digital manufacturing platforms and support the creation of innovative cross-platform composite applications that offer more added value, and ultimately help companies to meet the market demands for mass-customization or lot-size-one manufacturing.
+
+![The EFPF ecosystem](https://github.com/linksmart/blog/raw/master/_posts/resources/2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/efpf_ecosystem_mi_v1.png)
+
+#### Monitoring
+
+The EFPF ecosystem consists of centrally deployed ecosystem enablers such as the Data Spine, EFPF Portal, Marketplace, etc., and other distributed tools, services and platforms owned by different entities and deployed at different locations. The EFPF ecosystem administrator needs to ensure good health and proper functioning of the ecosystem enablers as well as the connected platforms. Because of the distributed nature of deployment, the traditional monitoring solutions that facilitate the monitoring of a centralized deployment cannot be used. The MI solution facilitates the monitoring of such a distributed deployment of tools, services, and platforms by collecting the availability and resource usage related information locally and sending it to the central monitoring server. This information can then be visualized using customized Grafana dashboards and alerts can be generated on detection of critical events using the AlertManager. This monitoring infrastructure can also be used by the individual platform administrators, by just installing the data collectors alongside their deployment, who would otherwise have to set up the complete monitoring solution from scratch for their respective platforms.
+ 
+#### Logging and Debugging
+ 
+In the EFPF ecosystem, a typical composite application orchestrates multiple services across different platforms together to achieve a common objective. In the cases where a composite application does not function as expected even when all its component services are up and running, a deep dive into the logs of the component services is needed to pinpoint the exact cause of the problem. In the EFPF ecosystem with the connected platforms owned and managed by different organizations, this is especially difficult. Contacting the system administrators of different platforms to check the logs of the component services would be very cumbersome and time consuming. The log collection, filtering and visualization functionalities provided by the MI solution support an easy debugging of issues across multiple platforms and simplifies the process of finding and fixing issues.
+
+#### Benefits of Historical Insights
+
+With the historical insights on the resource consumption information available, the EFPF administrator and the individual platform administrators can optimize the allocation of resources. In addition, if there are several tools/services available that provide similar functionalities, the consumers in the EFPF ecosystem can be empowered to make a better decision based on the availability information and other quality of service parameters for those tools/services.
 
 # Acknowledgement
 This work was funded by the European Commission (European Union) within the H2020 DT-ICT-07-2018-2019 project “European Connected Factory Platform for Agile Manufacturing” (EFPF), grant number 825075.
