@@ -1,0 +1,10 @@
+[sources.in]
+  type = "docker" # required
+
+[sinks.out]
+  endpoint = "example.com/loki/"  # required, change the url to the loki instance
+  inputs = ["in"] # required
+  type = "loki" # required
+  labels.containers = "host1/{{ container_name }}" # Change the label 
+                                              # accroding to the host name you want 
+                                              # the target to be identified with

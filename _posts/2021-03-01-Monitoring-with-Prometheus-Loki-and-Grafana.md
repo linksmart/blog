@@ -48,7 +48,7 @@ The monitoring server deployment can have the following file structure, where `c
 Let us set up the server by the following steps: 
 1. Download Docker compose file using wget  
     ```
-    wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/docker-compose.yaml
+    wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring-server/docker-compose.yaml
     ```
 2. Create a configuration directory and directories for docker volume directories. If the mounted data directories are not created beforehand, Docker engine creates these directories which cannot be altered by the containers and causes unexpected behaviors.
     ```
@@ -58,16 +58,16 @@ Let us set up the server by the following steps:
    ```
     sudo chown -R 5678:5678 data
    ```
-3. Create and edit Prometheus configuration file `conf/prometheus.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus.yaml). `scrape_configs` specify different jobs related to different targets for metric monitoring activities. Prometheus pulls the metrics from the endpoints mentioned under the `scrape_config`. The setting related to `alerting` configures Prometheus to send the alerts to `alertmanager` which further routes the generated alerts.    
+3. Create and edit Prometheus configuration file `conf/prometheus.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring-server/prometheus.yaml). `scrape_configs` specify different jobs related to different targets for metric monitoring activities. Prometheus pulls the metrics from the endpoints mentioned under the `scrape_config`. The setting related to `alerting` configures Prometheus to send the alerts to `alertmanager` which further routes the generated alerts.    
    More about the configuration can be found in the [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/).
    
-4. Create and edit Prometheus alert rules configuration file `conf/alert.rules`. A sample rule file can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus_alert.rules). In the sample, the group `targets` triggers alert whenever a scraping target of Prometheus is down. The other two groups create alerts whenever a container running in a target server is down.
+4. Create and edit Prometheus alert rules configuration file `conf/alert.rules`. A sample rule file can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring-server/prometheus_alert.rules). In the sample, the group `targets` triggers alert whenever a scraping target of Prometheus is down. The other two groups create alerts whenever a container running in a target server is down.
    More about the configuration can be found in the [official documentation](https://prometheus.io/docs/prometheus/latest/configuration/alerting_rules/).
 
-5. Create and edit the Alertmanager configuration file `conf/alertmanager.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/alertmanager.yaml).  Here the routing options such as mail servers and mailing lists are configured.
+5. Create and edit the Alertmanager configuration file `conf/alertmanager.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring-server/alertmanager.yaml).  Here the routing options such as mail servers and mailing lists are configured.
    More about the Alertmanager configuration can be found in the [official documentation](https://prometheus.io/docs/alerting/latest/configuration/).
  
-6. Create and edit the Loki configuration file `conf/Loki.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/Loki.yaml). More about the Loki configuration can be found in the [official documentation](https://grafana.com/docs/Loki/latest/configuration/).
+6. Create and edit the Loki configuration file `conf/Loki.yaml`. A sample configuration can be found [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring-server/loki.yaml). More about the Loki configuration can be found in the [official documentation](https://grafana.com/docs/Loki/latest/configuration/).
 7.  Change the Grafana configurations. You can do it by setting the [environmental variables](https://grafana.com/docs/grafana/latest/administration/configuration/) through docker-compose.yaml.  You can also pre-install Grafana plugins using the environmental variables.
 
 8.  Run all the services as docker containers. 
@@ -77,9 +77,24 @@ Let us set up the server by the following steps:
 
 
 ## Setting Up the Monitoring Clients
+Please follow the following steps to export metrics to prometheus
 ### 1. Exporting the metrics to Prometheus
 #### Export metrics using cAdvisor
-If you are running your containers in a virtual machine and want to expose metrics related to these containers to Prometheus, [cAdvisor](https://github.com/google/cadvisor) can be a handy tool.  Note that cAdvidor runs in privileged mode and mounts the root of the filesystem as a volume. This might cause security issues if the container is not frequently updated.
+If you are running your containers in a virtual machine and want to expose metrics related to these containers to Prometheus, [cAdvisor](https://github.com/google/cadvisor) can be a handy tool. You can run a Docker container of cAdvisor using the following command:
+```
+docker run --name cadvisor \
+   --restart unless-stopped \
+   -d \
+   -v /:/rootfs:ro \
+   -v /var/run:/var/run:rw \
+   -v /sys:/sys:ro \
+   -v /var/lib/docker/:/var/lib/docker:ro \
+   -p 8080:8080 \
+   --privileged \
+         google/cadvisor:latest
+
+```  
+Note that cAdvidor runs in privileged mode and mounts the root of the filesystem as a volume. This might cause security issues. Please ensure that you update this container regularly.
 
 #### Custom Prometheus exporters
 If you want to use a custom exporter, there are plenty of other exporters listed in the [Prometheus official page](https://prometheus.io/docs/instrumenting/exporters/). 
@@ -93,9 +108,19 @@ Once exporters are set up following the instructions mentioned in the User guide
       - targets: ['vm1:8080']
 ```
 
-## Log Monitoring Using Loki
-### 1. Exporting the Logs to Loki
-If you are running your containers in a server and want to expose logs related to these containers to Loki, [Vector](https://github.com/timberio/vector) can be a handy tool. You can also use [Promtail](https://grafana.com/docs/Loki/latest/clients/promtail/)  to push the logs to Loki. Other supported clients for Loki are listed [here](https://grafana.com/docs/Loki/latest/clients/). 
+## Setting up Log Monitoring clients
+### Exporting the Logs to Loki
+If you are running your containers in a server and want to expose logs related to these containers to Loki, [Vector](https://github.com/timberio/vector) can be a handy tool.  A sample configuration `vector.toml` for vector is [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring-target/vector.toml) which is set to export the docker logs to loki running in a sample server. Please update the configuration to update the target loki url and the hostname for proper labelling and run the vector using the following command: 
+```
+docker run \
+  -d \
+  -v ~/vector.toml:/etc/vector/vector.toml:ro \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -p 8383:8383 \
+  --restart unless-stopped \
+  timberio/vector:latest-alpine 
+```
+You can also use [Promtail](https://grafana.com/docs/Loki/latest/clients/promtail/)  to push the logs to Loki. Other supported clients for Loki are listed [here](https://grafana.com/docs/Loki/latest/clients/). 
 
 ## Visualization of the metrics and logs
 To visualize the Prometheus metrics and Loki logs in Grafana, the [Prometheus data source plugin](https://www.prometheus.io/docs/visualization/grafana/#grafana-support-for-prometheus) in Grafana needs to be configured. First, login to Grafana as admin with [default credentials](https://grafana.com/docs/grafana/latest/getting-started/getting-started/#step-2-log-in).

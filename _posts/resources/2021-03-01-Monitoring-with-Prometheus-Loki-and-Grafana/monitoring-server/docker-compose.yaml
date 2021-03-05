@@ -33,7 +33,7 @@ services:
     image: prom/alertmanager
     container_name: alertmanager
     volumes:
-      - ./conf/alertmanager.yaml:/etc/alertmanager/alertmanager.yaml
+      - ./conf/alertmanager.yaml:/etc/alertmanager/alertmanager.yaml:ro
       - ./data/alertmanager:/data
     command:
       - --config.file=/etc/alertmanager/alertmanager.yaml
@@ -46,7 +46,7 @@ services:
     image: grafana/loki
     container_name: loki
     volumes:
-      - ./conf/loki.yaml:/etc/loki/loki.yaml
+      - ./conf/loki.yaml:/etc/loki/loki.yaml:ro
       - ./data/loki:/mnt
     restart: unless-stopped
     ports:

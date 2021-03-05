@@ -84,8 +84,5 @@ exclude:
   - LICENSE
   - README.md
   - CNAME
-  - _posts/resources/2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/alertmanager.yaml
-  - _posts/resources/2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/loki.yaml
-  - _posts/resources/2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus.yaml
-  - _posts/resources/2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/docker-compose.yaml
-  - _posts/resources/2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/prometheus_alert.rules
+  - _posts/resources/2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring-server
+  - _posts/resources/2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring-target
