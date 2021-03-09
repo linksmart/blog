@@ -1,27 +1,27 @@
-With the growth of micro-service-based architectures, the points of failure have distributed across multiple applications and servers. This raises a need for an active monitoring solution that helps the administrators and the application developers to know the failures before even the users of the systems notice them. In this blog, we briefly introduce the responsibilities of the monitoring system followed by brief guidance to Prometheus and Loki based monitoring infrastructure.
+With the growth of micro-service-based architectures, the points of failure have distributed across multiple applications and servers. This raises a need for an active monitoring solution that helps the administrators and the application developers to know the failures before even the users of the systems notice them. In this blog, we briefly introduce the responsibilities of the monitoring system followed by brief guidance to the Prometheus and Loki based monitoring infrastructure.
 
 
 ## Motivation
 Monitoring infrastructure can help in the following aspects:
-### 1. Identification of Faults: 
-Faults such as network failures, unavailability, application exceptions resource overload are unpreventable while running a complex IT infrastructure. Monitoring helps in identifying the faults so that they are addressed on time. Most of the time, it is not just about the faults that have occurred already, rather it is about the faults that are about to occur. The monitoring system should facilitate the identification of possible faults by providing interactive dashboards and by providing timely alerts. Fault identification involves the indication of the existence of a fault and sometimes showing the exact point of failure. 
+### 1. Identification of faults: 
+Faults such as network failures, unavailability, application exceptions resource overload are unpreventable while running a complex IT infrastructure. Monitoring helps in identifying the faults so that they are addressed on time. Most of the time, it is not just about the faults that have occurred already, rather it is about the faults that are about to occur soon as a consequence of other malicious behaviours or lack of resources. The monitoring system should facilitate the identification of such signs by providing interactive dashboards and by providing timely alerts. Fault identification involves the indication of the existence of a fault. However, finding the exact point of failure often needs further debugging. 
 ### 2. Debugging
-Debugging an identified problem needs a deep investigation concerning the occurred fault or event. This sometimes needs different factors which revolve around the deployed service viz. CPU usage, internal logs, network transmissions, memory usage, and exceptions. Monitoring dashboards make such information available to the debuggers without manual extraction. Monitoring the logs accelerates the debugging provided there is a provision for visualization and filtering of logs.
-### 3. Data-Driven Insights
+Debugging an identified problem needs a deep investigation concerning the occurred fault or event. The root cause analysis of the problem needs an investigation of different factors specific to the deployed service viz. CPU usage, internal logs, network transmissions, memory usage, and exceptions, etc. Monitoring dashboards make such information available to the administrators without manual extraction. Monitoring the logs accelerates the debugging provided there is a provision for visualization and filtering of logs.
+### 3. Data-driven insights
 Analyzing the long-term and short-term data collected for a running service adds a multitude of strategic benefits. Historical data showing the resource usage of a service overtime assists in the decision related to the acquisition of the software, comparing the alternatives, scaling up/down the infrastructure. 
 
-Now that we listed out the overall purpose of the monitoring, a typical monitoring tool would provide mainly monitoring and reporting functionalities. Monitoring involves the gathering of various metrics and logs. Reporting involves the visualization and alerting based on the collected metrics. 
-Optionally monitoring tools can also perform certain administrative actions such as resource optimization (e.g. [Amazon Cloudwatch](https://aws.amazon.com/cloudwatch/)), providing remote management tooling ([NinjaRMM](https://www.ninjarmm.com/)) and IT workflow automation ([OpManager](https://www.manageengine.com/network-monitoring/)).
+Now that we have listed the overall purpose of the monitoring, let us discuss the general functionalities provided by monitoring tools. AA typical monitoring tool would provide mainly two functionalities: (1) Monitoring, that involves the gathering of various metrics and logs, and (2) Reporting, that involves the visualization and alerting based on the collected metrics. 
+In addition, some monitoring tools also perform administrative actions such as resource optimization (e.g. [Amazon Cloudwatch](https://aws.amazon.com/cloudwatch/)), providing remote management tooling ([NinjaRMM](https://www.ninjarmm.com/)) and IT workflow automation ([OpManager](https://www.manageengine.com/network-monitoring/)).
 ## Overview
-In this blog, we talk about monitoring using ope [Prometheus](https://prometheus.io/) and [Grafana Loki](https://grafana.com/oss/loki/). 
+In this blog, we talk about monitoring using opensource monitoring tools: [Prometheus](https://prometheus.io/) and [Grafana Loki](https://grafana.com/oss/loki/). 
 After reading this blog, the reader should be able to perform the following tasks:
 1. **Metrics Monitoring:** Metrics collected from the containers running on different hosts includes CPU, memory usage, and network transactions. We shall achieve this using Prometheus. 
-2. **Log Management:** Logging gives an insight into the running applications and their behavior. This can be used by the service providers to deduce the causes for malfunctioning and to get an overview of the client's behavior. We realize this using Loki.
+2. **Log Management:** Logging gives an insight into the running applications and their behavior. This can be used by the service providers to deduce the causes for malfunctioning and to get an overview of the target's behavior. We realize this using Loki.
 3. **Visualization and Alerting**: Monitored metrics and logs are visualized and explored using different Grafana panels. [Alertmanager](https://prometheus.io/docs/alerting/latest/alertmanager/) is used to manage the alerts generated by Prometheus
    
 
 # Deployment and Data Flow
-The figure below shows a monitoring infrastructure deployment where a Monitoring server monitors different target hosts running in local or remote premises. Prometheus, Loki, Grafana, and Alertmanagers are installed on the Monitoring server. The target hosts are installed with [Vector](https://github.com/timberio/vector) and [cAdvisor](https://github.com/google/cadvisor) to extract the logs and metrics respectively from the target hosts. Vector collects the docker logs and cAdvisor collects different docker metrics. Prometheus scrapes the metrics from cAdvisor. Loki on the other hand does not have a scraping mechanism and hence the logs are pushed by Vector to Loki. Both metrics (collected by Prometheus) and logs (collected by Loki) are visualized using Grafana. Generated alerts are forwarded to Alertmanager so that it is further grouped, deduplicated and routed to the relevant applications.
+The figure below shows a monitoring infrastructure deployment where a Monitoring server monitors different target hosts running in local or remote premises. Prometheus, Loki, Grafana, and Alertmanager are installed on the Monitoring server. [Vector](https://github.com/timberio/vector) and [cAdvisor](https://github.com/google/cadvisor) are installed on the target hosts to extract the logs and metrics respectively from the target hosts. Vector collects the docker logs and cAdvisor collects different docker metrics. Prometheus scrapes the metrics from cAdvisor. Loki, on the other hand, does not have a scraping mechanism and hence the logs are pushed by Vector to Loki. Both the metrics (collected by Prometheus) and the logs (collected by Loki) are visualized using Grafana. Generated alerts are forwarded to Alertmanager which then further groups, deduplicates and routes to the relevant applications such as email servers.
 
 ![The deployment and data flow](https://github.com/linksmart/blog/raw/master/_posts/resources/2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring.png)
 
@@ -30,7 +30,7 @@ The figure below shows a monitoring infrastructure deployment where a Monitoring
 
 The monitoring server is composed of Grafana, Prometheus, Loki, and Alertmanager. Optionally you can run Vector and cAdvisor in case you want to monitor the monitoring server itself.
 
-The monitoring server deployment can have the following file structure, where `conf/` directory has all the configurations and `data/` directory has all the docker volumes mounted to the docker containers running monitoring servers
+The monitoring server deployment can have the following file structure, where `conf/` directory has all the configurations and `data/` directory has all the docker volumes mounted to the docker containers running monitoring services.
 ```
 .
 +-- docker-compose.yaml
@@ -45,7 +45,7 @@ The monitoring server deployment can have the following file structure, where `c
 |   +-- Loki/
 |   +-- prometheus/
 ```
-Let us set up the server by the following steps: 
+Let us set up the server by following the steps below: 
 1. Download Docker compose file using wget  
     ```
     wget https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring-server/docker-compose.yaml
@@ -77,7 +77,7 @@ Let us set up the server by the following steps:
 
 
 ## Setting Up the Monitoring Clients
-Please follow the following steps to export metrics to prometheus
+Let us follow the following steps to export metrics to Prometheus
 ### 1. Exporting the metrics to Prometheus
 #### Export metrics using cAdvisor
 If you are running your containers in a virtual machine and want to expose metrics related to these containers to Prometheus, [cAdvisor](https://github.com/google/cadvisor) can be a handy tool. You can run a Docker container of cAdvisor using the following command:
@@ -94,13 +94,13 @@ docker run --name cadvisor \
          google/cadvisor:latest
 
 ```  
-Note that cAdvidor runs in privileged mode and mounts the root of the filesystem as a volume. This might cause security issues. Please ensure that you update this container regularly.
+Note that cAdvidor runs in privileged mode and mounts the root of the filesystem as a volume. Therefore, it is important to ensure that you update this container regularly to avoid any security issues.
 
 #### Custom Prometheus exporters
 If you want to use a custom exporter, there are plenty of other exporters listed in the [Prometheus official page](https://prometheus.io/docs/instrumenting/exporters/). 
 
 ### 2. Adding the scrape config in Prometheus
-Once exporters are set up following the instructions mentioned in the User guide, edit the  `prometheus.yaml` to add the following configuration.
+Once the exporters are set up following the instructions mentioned in the previous section, edit the  `prometheus.yaml` to add the following configuration.
 ```
   - job_name: cadvisor_vm1
     scrape_interval: 5s
@@ -108,9 +108,9 @@ Once exporters are set up following the instructions mentioned in the User guide
       - targets: ['vm1:8080']
 ```
 
-## Setting up Log Monitoring clients
-### Exporting the Logs to Loki
-If you are running your containers in a server and want to expose logs related to these containers to Loki, [Vector](https://github.com/timberio/vector) can be a handy tool.  A sample configuration `vector.toml` for vector is [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring-target/vector.toml) which is set to export the docker logs to loki running in a sample server. Please update the configuration to update the target loki url and the hostname for proper labelling and run the vector using the following command: 
+## Setting up the Log Monitoring Clients
+### Exporting logs to Loki
+If you are running your containers in a server and want to export the logs related to these containers to Loki, [Vector](https://github.com/timberio/vector) can be a handy tool.  A sample configuration `vector.toml` for vector is [here](https://raw.githubusercontent.com/linksmart/blog/master/_posts\resources\2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/monitoring-target/vector.toml) which is set to export the docker logs to loki running in a sample server. Update the target loki url and the hostname for proper labelling  in the configuration and run the vector using the following command: 
 ```
 docker run \
   -d \
@@ -122,8 +122,8 @@ docker run \
 ```
 You can also use [Promtail](https://grafana.com/docs/Loki/latest/clients/promtail/)  to push the logs to Loki. Other supported clients for Loki are listed [here](https://grafana.com/docs/Loki/latest/clients/). 
 
-## Visualization of the metrics and logs
-To visualize the Prometheus metrics and Loki logs in Grafana, the [Prometheus data source plugin](https://www.prometheus.io/docs/visualization/grafana/#grafana-support-for-prometheus) in Grafana needs to be configured. First, login to Grafana as admin with [default credentials](https://grafana.com/docs/grafana/latest/getting-started/getting-started/#step-2-log-in).
+## Visualization of the Metrics and Logs
+To visualize the Prometheus metrics and Loki logs in Grafana, the [Prometheus data source plugin](https://www.prometheus.io/docs/visualization/grafana/#grafana-support-for-prometheus) in Grafana needs to be configured. First, login to Grafana as admin with the [default credentials](https://grafana.com/docs/grafana/latest/getting-started/getting-started/#step-2-log-in).
 Then, follow the instructions specified in the official documentation of [Prometheus data source plugin](https://www.prometheus.io/docs/visualization/grafana/#creating-a-prometheus-data-source)  and [Loki data source plugin](https://grafana.com/docs/grafana/latest/datasources/Loki/#adding-the-data-source) to set up the plugins.
 
 ### Exploring Loki and Prometheus
@@ -133,9 +133,10 @@ Loki can be explored using [LogQL](https://grafana.com/docs/Loki/latest/logql/) 
 - Overall CPU usage (percentage) of all the containers running in a host for 5 minutes
 
    `rate(container_cpu_user_seconds_total{image!="",job="<target name>"}[5m]) * 100`
-- Overall Memory usage of all the containers running in a host
+- Overall memory usage of all the containers running in a host
 
    `container_memory_usage_bytes{image!="",job="<target name>"}`
+   
 #### LogQL examples
 - Get the NGINX logs where there was HTTP error :
    This query shall show the logs there are 4xx or 5xx errors:  
@@ -148,7 +149,7 @@ Loki can be explored using [LogQL](https://grafana.com/docs/Loki/latest/logql/) 
 
    The result is a metric. Therefore this can be visualized using panels
 
-### Visualization using Grafana Panels
+### Visualization using Grafana panels
 If the exporter to Prometheus is cAdvisor, then a ready-made [cadvisor-prometheus panel](https://grafana.com/grafana/dashboards/193) can be used to visualize the docker containers.
 
 ![Monitoring the docker containers running in a server](https://github.com/linksmart/blog/raw/master/_posts/resources/2021-03-01-Monitoring-with-Prometheus-Loki-and-Grafana/docker-monitoring-panel.png)
