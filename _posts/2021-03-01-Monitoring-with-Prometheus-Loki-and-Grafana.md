@@ -136,7 +136,7 @@ Loki can be explored using [LogQL](https://grafana.com/docs/Loki/latest/logql/) 
 - Overall memory usage of all the containers running in a host
 
    `container_memory_usage_bytes{image!="",job="<target name>"}`
-   
+
 #### LogQL examples
 - Get the NGINX logs where there was HTTP error :
    This query shall show the logs there are 4xx or 5xx errors:  
